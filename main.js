@@ -11,13 +11,12 @@ const CONSTANTS = {
  * Extracts user messages from ChatGPT frontend
  */
 class UserMessageExtractor {
-    static extractAllMessages () {
-        const userMessages = document.querySelectorAll(
-            CONSTANTS.USER_MESSAGE,
-        );
-        //console.log(userMessages); - will output user messages!
-        return Array.from(userMessages)
-        .map((el) => el.textContent.trim());
+    static extractAllMessages() {
+        return Array.from(document.querySelectorAll(CONSTANTS.USER_MESSAGE)).map((el, index) => {
+            const id = `user-message-${index}`; // these are backticks ALT GR + 7 = `
+            el.id = id;
+            return { id, text: el.textContent.trim() };
+        });
     }
 }
 
@@ -51,11 +50,13 @@ class TOCDiv {
             const list = document.createElement("li");
             const anchor = document.createElement("a");
 
-            const isTooLong = item.length > CONSTANTS.MAX_MESSAGE_LENGTH;
-            const trimmedText = item.slice(0, CONSTANTS.MAX_MESSAGE_LENGTH);
-            anchor.textContent = isTooLong ? trimmedText + '...' : item;
+            anchor.href = `#${item.id}`; // links to every user message
 
-            anchor.href = "https://google.com"; // placeholder
+            const isTooLong = item.text.length > CONSTANTS.MAX_MESSAGE_LENGTH;
+            const trimmedText = item.text.slice(0, CONSTANTS.MAX_MESSAGE_LENGTH);
+            anchor.textContent = isTooLong ? trimmedText + '...' : item.text;
+
+
             list.appendChild(anchor);
             orderedList.appendChild(list);
         }
