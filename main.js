@@ -4,7 +4,7 @@
 const CONSTANTS = {
     USER_MESSAGE: 'div[class*="user-message"]',
     WAIT_TIME: 3000, // 3000 ms = 3 seconds
-    MAX_MESSAGE_LENGTH: 80
+    MAX_MESSAGE_LENGTH: 50
 };
 
 /**
@@ -25,13 +25,33 @@ class UserMessageExtractor {
  */
 class TOCDiv {
     static container = null;
-    static createContainer() {
+    static createContainer(targetSelector) {
         this.container = document.createElement("div");
-        document.body.appendChild(this.container);
+        this.container.id = "tocContainer";
+        this.container.style.overflowY = "auto"; // scroll if long
+        this.container.style.zIndex = "1000";
+        this.container.style.position = "absolute";
+        this.container.style.width = "100%";      
+        this.container.style.maxWidth = "250px";  
+        this.container.style.minWidth = "180px";
+        this.container.style.height = "100%";  
+        this.container.style.maxHeight = "620px";
+
+
+        const chatContainer = document.querySelector('div[class*="relative"][class*="flex-col"][class*="grow"]');
+        if (chatContainer) {
+            chatContainer.style.position = "relative"; // create positioning context
+            chatContainer.appendChild(this.container);
+        } else {
+            console.warn("Chat container not found");
+            document.body.appendChild(this.container);
+        }
+
+        //document.body.appendChild(this.container);
     }
 
     static createHeader() {
-        const header = document.createElement("div")
+        const header = document.createElement("div");
         const title = document.createElement("h1");
         title.textContent = "Table of contents";
         header.appendChild(title);
@@ -40,6 +60,7 @@ class TOCDiv {
 
     static createList(userMessages) {
         const listContainer = document.createElement("div");
+        listContainer.id = "listContainer"
         const orderedList = document.createElement("ol");
         orderedList.style.listStyle = "decimal";
         orderedList.style.paddingLeft = "20px"; // ensures spacing for numbers
@@ -74,11 +95,10 @@ class TOCExtension {
         const userMessages = UserMessageExtractor.extractAllMessages();
         console.log(userMessages);
 
-        TOCDiv.createContainer();
+        TOCDiv.createContainer('#page-header');
         TOCDiv.createHeader();
         TOCDiv.createList(userMessages);
     }
-    
 }
 
 setTimeout(() => {
@@ -87,7 +107,7 @@ setTimeout(() => {
 
 
 // test - adds a div to the page
-console.log("Content script loaded from ChatGPT ToC extension!");
-const testDiv = document.createElement("div");
-testDiv.textContent = "If you see this content script is loaded successfully!";
-document.body.appendChild(testDiv); // this is required so the div shows up
+// console.log("Content script loaded from ChatGPT ToC extension!");
+// const testDiv = document.createElement("div");
+// testDiv.textContent = "If you see this content script is loaded successfully!";
+// document.body.appendChild(testDiv); // this is required so the div shows up
