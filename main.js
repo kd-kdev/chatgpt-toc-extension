@@ -41,11 +41,25 @@ class TOCDiv {
 
     static createList(userMessages) {
         const listContainer = document.createElement("div");
+        const orderedList = document.createElement("ol");
+        orderedList.style.listStyle = "decimal";
+        orderedList.style.paddingLeft = "20px"; // ensures spacing for numbers
+        orderedList.style.margin = "1em 0"; // optional for spacing
+
+
         for (const item of userMessages) {
             const list = document.createElement("li");
-            list.textContent = item.slice(0, CONSTANTS.MAX_MESSAGE_LENGTH);
-            listContainer.appendChild(list);
+            const anchor = document.createElement("a");
+
+            const isTooLong = item.length > CONSTANTS.MAX_MESSAGE_LENGTH;
+            const trimmedText = item.slice(0, CONSTANTS.MAX_MESSAGE_LENGTH);
+            anchor.textContent = isTooLong ? trimmedText + '...' : item;
+
+            anchor.href = "https://google.com"; // placeholder
+            list.appendChild(anchor);
+            orderedList.appendChild(list);
         }
+        listContainer.appendChild(orderedList);
         this.container.appendChild(listContainer);
     }
 }
