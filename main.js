@@ -3,7 +3,8 @@
  */
 const CONSTANTS = {
     USER_MESSAGE: 'div[class*="user-message"]',
-    WAIT_TIME: 3000
+    WAIT_TIME: 3000, // 3000 ms = 3 seconds
+    MAX_MESSAGE_LENGTH: 80
 };
 
 /**
@@ -14,16 +15,41 @@ class UserMessageExtractor {
         const userMessages = document.querySelectorAll(
             CONSTANTS.USER_MESSAGE,
         );
-        console.log(userMessages);
+        //console.log(userMessages); - will output user messages!
+        return Array.from(userMessages)
+        .map((el) => el.textContent.trim());
     }
 }
+
+/**
+ * Creates the table of contents div
+ */
+class TOCDiv {
+
+    static createContainer() {
+
+    }
+
+    static createHeader() {
+
+    }
+
+    static createList() {
+
+    }
+}
+
 
 /**
  * Main class
  */
 class TOCExtension {
     constructor() {
-        UserMessageExtractor.extractAllMessages();
+        console.log(UserMessageExtractor.extractAllMessages());
+
+        TOCDiv.createContainer();
+        TOCDiv.createHeader();
+        TOCDiv.createList();
     }
     
 }
