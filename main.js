@@ -25,17 +25,28 @@ class UserMessageExtractor {
  * Creates the table of contents div
  */
 class TOCDiv {
-
+    static container = null;
     static createContainer() {
-
+        this.container = document.createElement("div");
+        document.body.appendChild(this.container);
     }
 
     static createHeader() {
-
+        const header = document.createElement("div")
+        const title = document.createElement("h1");
+        title.textContent = "Table of contents";
+        header.appendChild(title);
+        this.container.appendChild(header);
     }
 
-    static createList() {
-
+    static createList(userMessages) {
+        const listContainer = document.createElement("div");
+        for (const item of userMessages) {
+            const list = document.createElement("li");
+            list.textContent = item.slice(0, CONSTANTS.MAX_MESSAGE_LENGTH);
+            listContainer.appendChild(list);
+        }
+        this.container.appendChild(listContainer);
     }
 }
 
@@ -45,11 +56,12 @@ class TOCDiv {
  */
 class TOCExtension {
     constructor() {
-        console.log(UserMessageExtractor.extractAllMessages());
+        const userMessages = UserMessageExtractor.extractAllMessages();
+        console.log(userMessages);
 
         TOCDiv.createContainer();
         TOCDiv.createHeader();
-        TOCDiv.createList();
+        TOCDiv.createList(userMessages);
     }
     
 }
