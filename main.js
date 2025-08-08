@@ -20,7 +20,8 @@ class TOCExtension {
 }
 
 
-// test
+// test - adds a div to the page
 console.log("Content script loaded from ChatGPT ToC extension!");
-const div = document.createElement(div);
-div.textContent = "If you see this content script is loaded successfully!";
+const testDiv = document.createElement("div");
+testDiv.textContent = "If you see this content script is loaded successfully!";
+document.body.appendChild(testDiv); // this is required so the div shows up
