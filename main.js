@@ -2,22 +2,35 @@
  * Defining constants
  */
 const CONSTANTS = {
-    USER_MESSAGE: 'div[data-message-author-role="user"]'
-}
+    USER_MESSAGE: 'div[class*="user-message"]',
+    WAIT_TIME: 3000
+};
 
 /**
  * Extracts user messages from ChatGPT frontend
  */
 class UserMessageExtractor {
-
+    static extractAllMessages () {
+        const userMessages = document.querySelectorAll(
+            CONSTANTS.USER_MESSAGE,
+        );
+        console.log(userMessages);
+    }
 }
 
 /**
  * Main class
  */
 class TOCExtension {
-
+    constructor() {
+        UserMessageExtractor.extractAllMessages();
+    }
+    
 }
+
+setTimeout(() => {
+    const tocExtension = new TOCExtension();
+}, CONSTANTS.WAIT_TIME);
 
 
 // test - adds a div to the page
