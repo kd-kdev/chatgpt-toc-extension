@@ -4,7 +4,7 @@
 const CONSTANTS = {
     USER_MESSAGE: 'div[class*="user-message"]',
     WAIT_TIME: 3000, // 3000 ms = 3 seconds
-    MAX_MESSAGE_LENGTH: 50
+    MAX_MESSAGE_LENGTH: 70
 };
 
 /**
@@ -28,61 +28,70 @@ class TOCDiv {
     static createContainer(targetSelector) {
         this.container = document.createElement("div");
         this.container.id = "tocContainer";
-        this.container.style.overflowY = "auto"; // scroll if long
-
-        //this.container.style.position = "relative"; // or just don't set it at all
-        this.container.style.width = "250px";
-        this.container.style.maxWidth = "250px";
-        this.container.style.minWidth = "180px";
-        this.container.style.flexShrink = "0"; // keep width fixed
-        this.container.style.height = "100%";
+        this.container.style.position = "absolute";   // overlay position
         this.container.style.maxHeight = "620px";
-        this.container.style.overflowY = "auto";
+        this.container.style.overflowY = "auto"; // scroll if long
+        this.container.style.overflowX = "hidden"; // hide width scroll bar
+        this.container.style.zIndex = "1000";   // keep on top but adjust if needed
 
+        // update width according to viewport
+        const viewportWidth = window.innerWidth;
+        const desiredWidth = Math.min(Math.max(viewportWidth * 0.15, 180), 400); // 20% of viewport width, clamped between 180 and 300 px
+
+        this.container.style.width = `${desiredWidth}px`;
+        this.container.style.minWidth = "180px";
+        this.container.style.maxWidth = "400px";
 
         // Find layout container
-        // this one below will make the TOC to the right side, doesn't look too bad ?
-        //const layoutContainer = document.querySelector("div.relative.flex.h-full.max-w-full.flex-1.flex-col");
         const layoutContainer = document.querySelector("#thread");
         if (!layoutContainer) {
             console.warn("Layout container not found");
             return;
         }
 
-        layoutContainer.style.display = "flex";
-        layoutContainer.style.flexDirection = "row"; // make sure sidebar + TOC + chat are side-by-side
+        // layoutContainer.style.display = "flex";
+        // layoutContainer.style.flexDirection = "row";
 
-        // Find sidebar
+        // Find sidebar & header
         const sidebar = layoutContainer.querySelector("#stage-slideover-sidebar");
-
-
-        // Instead of inserting TOC inside sidebar,
-        // insert TOC **after sidebar** so it appears between sidebar and main chat
-        if (sidebar) {
-            sidebar.insertAdjacentElement("afterend", this.container);
-        } else {
-            console.warn("Sidebar not found");
-            // fallback: add TOC as first child of #thread
-            layoutContainer.insertAdjacentElement("afterbegin", this.container);
-        }
-
-
         const page_header = document.querySelector("#page-header");
         if (!page_header) {
             console.warn("Header element not found");
             return;
         }
+        if (!sidebar) {
+            console.warn("Sidebar not found");
+        }
 
-        const updateTOCTopOffset = () => {
+        // Append TOC container to layoutContainer (so it’s positioned relative to it)
+        layoutContainer.style.position = "relative";  // needed for absolute positioning inside
+        layoutContainer.appendChild(this.container);
+
+        // Function to update TOC position & height dynamically
+        const updateTOCPosition = () => {
             const headerHeight = page_header.getBoundingClientRect().height;
-            this.container.style.marginTop = `${headerHeight}px`;
+            const sidebarWidth = sidebar ? sidebar.getBoundingClientRect().width : 0;
+            const layoutRect = layoutContainer.getBoundingClientRect();
+
+            // Update width dynamically on every call (on resize)
+            const viewportWidth = window.innerWidth;
+            const desiredWidth = Math.min(Math.max(viewportWidth * 0.15, 180), 400);
+            this.container.style.width = `${desiredWidth}px`;
+
+            // Position TOC container relative to #thread
+            this.container.style.top = `${headerHeight}px`;
+            this.container.style.left = `${sidebarWidth}px`;
+
+            // Height: fill from below header to bottom of layout container viewport
+            this.container.style.height = `${layoutRect.height - headerHeight}px`;
         };
 
-        // Initial call to set margin-top
-        updateTOCTopOffset();
+        // Initial call
+        updateTOCPosition();
 
         // Update on window resize
-        window.addEventListener("resize", updateTOCTopOffset);
+        window.addEventListener("resize", updateTOCPosition);
+
 
     }
 

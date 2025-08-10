@@ -17,18 +17,23 @@
     border-bottom: 0.5px solid white;
 }
 
+#listContainer {
+    word-break: break-all;
+    white-space: normal;
+}
+
 #listContainer a:hover {
     background-color: #ffffff1a;
 }
 
 #listContainer ol {
-    padding-left: 14px;
+    padding-left: 28px;
 }
 
 #tocContainer h1 {
     font-size: 0.8rem;
     padding-left: 8px;
-    padding-top: 16px;
+    padding-top: 10px;
     margin-bottom: 4px;
 }
 
