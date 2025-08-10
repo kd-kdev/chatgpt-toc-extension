@@ -41,3 +41,17 @@
     font-size: 0.7rem;
     margin-bottom: 6px;
 }
+
+#toggleButton {
+  background-color: #181818;    /* dark gray background */
+  color: white;                 /* white text */
+  border: none;                 /* no border */
+  border-radius: 8px;           /* rounded corners */
+  font-size: 1.3em;
+  font-weight: bold;             /* slightly bigger text */
+  cursor: pointer;              /* pointer on hover */
+  user-select: none;            /* prevent text selection */
+  padding-bottom: 2px;
+  padding-left: 14px;
+  padding-right: 14px;
+}

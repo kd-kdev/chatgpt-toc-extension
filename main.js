@@ -101,14 +101,49 @@ class TOCDiv {
         // Clear old TOC content before recreating list
         this.container.querySelector("#listContainer")?.remove();
         this.createList(userMessages);
+
     }
 
 
     static createHeader() {
         const header = document.createElement("div");
         header.id="tocheader";
+        header.style.display = "flex";
+        header.style.justifyContent = "left";
+        header.style.alignItems = "flex-start";
+        header.style.padding = "5px 10px";
+
+        const toggleButton = document.createElement("button");
+        toggleButton.id="toggleButton";
+        toggleButton.textContent = "-";
+        toggleButton.style.cursor = "pointer";
+        toggleButton.style.backgroundColor = "#181818";
+
         const title = document.createElement("h1");
         title.textContent = "Table of contents";
+
+        // When clicked, toggle the TOC content visibility
+        toggleButton.addEventListener("click", () => {
+            const listContainer = this.container.querySelector("#listContainer");
+            if (listContainer) {
+        const listContainer = this.container.querySelector("#listContainer");
+        if (!listContainer) return;
+                const isCollapsed = listContainer.style.display === "none";
+
+                // Toggle TOC list visibility
+                listContainer.style.display = isCollapsed ? "block" : "none";
+
+                // Toggle title visibility (hide/show)
+                title.style.display = isCollapsed ? "block" : "none";
+
+                header.style.borderBottom = isCollapsed ? "0.5px solid white" : "none";
+
+                // Optionally change icon to X or something when collapsed
+                toggleButton.textContent = isCollapsed ? "-" : "☰";
+            }
+        });
+
+        header.appendChild(toggleButton);
         header.appendChild(title);
         this.container.appendChild(header);
     }
