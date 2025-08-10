@@ -4,7 +4,7 @@
 const CONSTANTS = {
     USER_MESSAGE: 'div[class*="user-message"]',
     WAIT_TIME: 3000, // 3000 ms = 3 seconds
-    MAX_MESSAGE_LENGTH: 70
+    MAX_MESSAGE_LENGTH: 80
 };
 
 /**
@@ -111,7 +111,7 @@ class TOCDiv {
         header.style.display = "flex";
         header.style.justifyContent = "left";
         header.style.alignItems = "flex-start";
-        header.style.padding = "5px 10px";
+        header.style.padding = "5px 8px";
 
         const toggleButton = document.createElement("button");
         toggleButton.id="toggleButton";

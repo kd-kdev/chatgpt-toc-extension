@@ -5,8 +5,24 @@
 
     height: 100%;          /* fill vertical space */
     overflow-y: auto;      /* enable vertical scroll */
-    flex-shrink: 0;        /* prevent shrinking */
+    flex-shrink: 0;        
 }
+
+#tocContainer a {
+  display: block;          
+  padding: 4px 8px;       
+  margin-right: 4px;
+  border-radius: 8px;            
+  text-decoration: none;         
+  color: inherit;                 
+  transition: background-color 0.3s ease;
+}
+
+#tocContainer a:hover {
+  background-color: #181818;
+  cursor: pointer;
+}
+
 
 #tocheader {
     position: sticky;
@@ -43,14 +59,14 @@
 }
 
 #toggleButton {
-  background-color: #181818;    /* dark gray background */
-  color: white;                 /* white text */
-  border: none;                 /* no border */
-  border-radius: 8px;           /* rounded corners */
+  background-color: #181818;   
+  color: white;            
+  border: none;                
+  border-radius: 8px;          
   font-size: 1.3em;
-  font-weight: bold;             /* slightly bigger text */
-  cursor: pointer;              /* pointer on hover */
-  user-select: none;            /* prevent text selection */
+  font-weight: bold;            
+  cursor: pointer;             
+  user-select: none;            
   padding-bottom: 2px;
   padding-left: 14px;
   padding-right: 14px;
