@@ -4,7 +4,8 @@
 const CONSTANTS = {
     USER_MESSAGE: 'div[class*="user-message"]',
     WAIT_TIME: 3000, // 3000 ms = 3 seconds
-    MAX_MESSAGE_LENGTH: 80
+    MAX_MESSAGE_LENGTH: 80,
+    CHAT_CHANGE_DELAY: 800
 };
 
 /**
@@ -95,16 +96,6 @@ class TOCDiv {
         window.addEventListener("resize", updateTOCPosition);
 
     }
-
-    static updateTOC() {
-        const userMessages = UserMessageExtractor.extractAllMessages();
-        // Clear old TOC content before recreating list
-        this.container.querySelector("#listContainer")?.remove();
-        this.createList(userMessages);
-
-    }
-
-
     static createHeader() {
         const header = document.createElement("div");
         header.id="tocheader";
@@ -125,22 +116,13 @@ class TOCDiv {
         // When clicked, toggle the TOC content visibility
         toggleButton.addEventListener("click", () => {
             const listContainer = this.container.querySelector("#listContainer");
-            if (listContainer) {
-        const listContainer = this.container.querySelector("#listContainer");
-        if (!listContainer) return;
-                const isCollapsed = listContainer.style.display === "none";
-
-                // Toggle TOC list visibility
-                listContainer.style.display = isCollapsed ? "block" : "none";
-
-                // Toggle title visibility (hide/show)
-                title.style.display = isCollapsed ? "block" : "none";
-
-                header.style.borderBottom = isCollapsed ? "0.5px solid white" : "none";
-
-                // Optionally change icon to X or something when collapsed
-                toggleButton.textContent = isCollapsed ? "-" : "☰";
-            }
+            if (!listContainer) return;
+            const isCollapsed = listContainer.style.display === "none";
+            // toggle display & button text
+            listContainer.style.display = isCollapsed ? "block" : "none";
+            title.style.display = isCollapsed ? "block" : "none";
+            header.style.borderBottom = isCollapsed ? "0.5px solid white" : "none";
+            toggleButton.textContent = isCollapsed ? "-" : "☰";
         });
 
         header.appendChild(toggleButton);
@@ -174,7 +156,32 @@ class TOCDiv {
         listContainer.appendChild(orderedList);
         this.container.appendChild(listContainer);
     }
+
+    static updateTOC() {
+        console.log("updateTOC static method called!");
+        if (!this.container) {
+            console.warn("TOC container does not exist. Creating it again.");
+            this.createContainer('#page-header');
+            this.createHeader();
+        } else if (!document.body.contains(this.container)) {
+            console.warn("TOC container exists but is not in the DOM. Re-appending.");
+            const layoutContainer = document.querySelector("#thread");
+            if (layoutContainer) {
+                layoutContainer.style.position = "relative";
+                layoutContainer.appendChild(this.container);
+            }
+        }
+
+        // Now safe to update list
+        const userMessages = UserMessageExtractor.extractAllMessages();
+
+        this.container.querySelector("#listContainer")?.remove();
+        this.createList(userMessages);
+
+    }
 }
+
+let chatMessagesObserver = null;
 
 // Mutation observer - updates the TOC
 function setupMutationObserver() {
@@ -184,7 +191,11 @@ function setupMutationObserver() {
         if (chatMessagesContainer) {
             console.log('Chat messages container found. Setting up observer.');
 
-        const observer = new MutationObserver((mutationsList) => {
+        if (chatMessagesObserver) {
+            chatMessagesObserver.disconnect();
+        }
+
+        chatMessagesObserver = new MutationObserver((mutationsList) => {
         for (const mutation of mutationsList) {
             if (mutation.type === 'childList') {
             // Check added nodes
@@ -198,14 +209,51 @@ function setupMutationObserver() {
         }
         });
 
-        observer.observe(chatMessagesContainer, {
+        chatMessagesObserver.observe(chatMessagesContainer, {
             childList: true,
             subtree: true
         });
     } else {
         console.warn('Chat message container NOT found.');
     }
+    return chatMessagesObserver;
 }
+
+// Mutation observer for switching chats
+function chatMutationObserver() {
+    let currentChatId = getCurrentChatId();
+    let lastUrl = location.href;
+
+    const observer = new MutationObserver(() => {
+        const url = location.href;
+        if (url !== lastUrl) {
+            lastUrl = url;
+            const newChatId = getCurrentChatId();
+            if (newChatId !== currentChatId) {
+                console.log(`Chat changed from ${currentChatId} to ${newChatId}`);
+                currentChatId = newChatId;
+                setupMutationObserver();
+                setTimeout(() => TOCDiv.updateTOC(), CONSTANTS.WAIT_TIME);
+            }
+        }
+    });
+
+    observer.observe(document, { subtree: true, childList: true });
+}
+
+function getCurrentChatId() {
+    const url = window.location.href;
+    const match = url.match(/chatgpt\.com\/c\/([^/?#]+)/);
+    return match ? match[1] : null;
+}
+
+// function checkChatChange() {
+//     const newChatId = getCurrentChatId();
+//     if (newChatId !== this.currentChatId) {
+//       console.log(`Chat changed from ${this.currentChatId} to ${newChatId}`);
+//       this.currentChatId = newChatId;
+//       setTimeout(() => TOCDiv.updateTOC(), CONSTANTS.WAIT_TIME);
+//     }
 
 
 /**
@@ -225,23 +273,5 @@ class TOCExtension {
 setTimeout(() => {
     const tocExtension = new TOCExtension();
     setupMutationObserver();
+    chatMutationObserver();
 }, CONSTANTS.WAIT_TIME);
-
-/**
- * TODO:
- * Add mutator to watch for changes & update when user inputs more messages
- * Fix offset from top
- * Add smooth scroll up to element, no jerkiness
- * Make responsive
- * Style so it looks like a part of ChatGPT
- * Make icons
- * Package & release on store
- */
-
-
-
-// test - adds a div to the page
-// console.log("Content script loaded from ChatGPT ToC extension!");
-// const testDiv = document.createElement("div");
-// testDiv.textContent = "If you see this content script is loaded successfully!";
-// document.body.appendChild(testDiv); // this is required so the div shows up
