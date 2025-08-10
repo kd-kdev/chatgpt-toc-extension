@@ -53,7 +53,9 @@ class TOCDiv {
         // layoutContainer.style.flexDirection = "row";
 
         // Find sidebar & header
-        const sidebar = layoutContainer.querySelector("#stage-slideover-sidebar");
+        const sidebar = layoutContainer.querySelector(
+        'nav[class*="group/scrollport"].relative.flex.h-full.w-full.flex-1.flex-col.overflow-y-auto.transition-opacity.duration-500'
+        );
         const page_header = document.querySelector("#page-header");
         if (!page_header) {
             console.warn("Header element not found");
@@ -92,8 +94,15 @@ class TOCDiv {
         // Update on window resize
         window.addEventListener("resize", updateTOCPosition);
 
-
     }
+
+    static updateTOC() {
+        const userMessages = UserMessageExtractor.extractAllMessages();
+        // Clear old TOC content before recreating list
+        this.container.querySelector("#listContainer")?.remove();
+        this.createList(userMessages);
+    }
+
 
     static createHeader() {
         const header = document.createElement("div");
@@ -132,6 +141,37 @@ class TOCDiv {
     }
 }
 
+// Mutation observer - updates the TOC
+function setupMutationObserver() {
+
+    const chatMessagesContainer = document.querySelector('div[class*="@thread-xl/thread:pt-header-height"]');
+
+        if (chatMessagesContainer) {
+            console.log('Chat messages container found. Setting up observer.');
+
+        const observer = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+            // Check added nodes
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType === Node.ELEMENT_NODE && node.tagName.toLowerCase() === 'article') {
+                console.log('New <article> added:', node);
+                TOCDiv.updateTOC();
+                }
+            });
+            }
+        }
+        });
+
+        observer.observe(chatMessagesContainer, {
+            childList: true,
+            subtree: true
+        });
+    } else {
+        console.warn('Chat message container NOT found.');
+    }
+}
+
 
 /**
  * Main class
@@ -149,6 +189,7 @@ class TOCExtension {
 
 setTimeout(() => {
     const tocExtension = new TOCExtension();
+    setupMutationObserver();
 }, CONSTANTS.WAIT_TIME);
 
 /**
