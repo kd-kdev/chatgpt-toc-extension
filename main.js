@@ -28,14 +28,16 @@ class TOCDiv {
     static createContainer(targetSelector) {
         this.container = document.createElement("div");
         this.container.id = "tocContainer";
+
         this.container.style.overflowY = "auto"; // scroll if long
         this.container.style.zIndex = "1000";
         this.container.style.position = "absolute";
-        this.container.style.width = "100%";      
+        this.container.style.width = "100%";
         this.container.style.maxWidth = "250px";  
         this.container.style.minWidth = "180px";
         this.container.style.height = "100%";  
         this.container.style.maxHeight = "620px";
+
 
 
         const chatContainer = document.querySelector('div[class*="relative"][class*="flex-col"][class*="grow"]');
@@ -47,7 +49,7 @@ class TOCDiv {
             document.body.appendChild(this.container);
         }
 
-        //document.body.appendChild(this.container);
+
     }
 
     static createHeader() {
@@ -104,6 +106,18 @@ class TOCExtension {
 setTimeout(() => {
     const tocExtension = new TOCExtension();
 }, CONSTANTS.WAIT_TIME);
+
+/**
+ * TODO:
+ * Add mutator to watch for changes & update when user inputs more messages
+ * Fix offset from top
+ * Add smooth scroll up to element, no jerkiness
+ * Make responsive
+ * Style so it looks like a part of ChatGPT
+ * Make icons
+ * Package & release on store
+ */
+
 
 
 // test - adds a div to the page
