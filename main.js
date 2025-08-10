@@ -28,32 +28,67 @@ class TOCDiv {
     static createContainer(targetSelector) {
         this.container = document.createElement("div");
         this.container.id = "tocContainer";
-
         this.container.style.overflowY = "auto"; // scroll if long
-        this.container.style.zIndex = "1000";
-        this.container.style.position = "absolute";
-        this.container.style.width = "100%";
-        this.container.style.maxWidth = "250px";  
+
+        //this.container.style.position = "relative"; // or just don't set it at all
+        this.container.style.width = "250px";
+        this.container.style.maxWidth = "250px";
         this.container.style.minWidth = "180px";
-        this.container.style.height = "100%";  
+        this.container.style.flexShrink = "0"; // keep width fixed
+        this.container.style.height = "100%";
         this.container.style.maxHeight = "620px";
+        this.container.style.overflowY = "auto";
 
 
-
-        const chatContainer = document.querySelector('div[class*="relative"][class*="flex-col"][class*="grow"]');
-        if (chatContainer) {
-            chatContainer.style.position = "relative"; // create positioning context
-            chatContainer.appendChild(this.container);
-        } else {
-            console.warn("Chat container not found");
-            document.body.appendChild(this.container);
+        // Find layout container
+        // this one below will make the TOC to the right side, doesn't look too bad ?
+        //const layoutContainer = document.querySelector("div.relative.flex.h-full.max-w-full.flex-1.flex-col");
+        const layoutContainer = document.querySelector("#thread");
+        if (!layoutContainer) {
+            console.warn("Layout container not found");
+            return;
         }
 
+        layoutContainer.style.display = "flex";
+        layoutContainer.style.flexDirection = "row"; // make sure sidebar + TOC + chat are side-by-side
+
+        // Find sidebar
+        const sidebar = layoutContainer.querySelector("#stage-slideover-sidebar");
+
+
+        // Instead of inserting TOC inside sidebar,
+        // insert TOC **after sidebar** so it appears between sidebar and main chat
+        if (sidebar) {
+            sidebar.insertAdjacentElement("afterend", this.container);
+        } else {
+            console.warn("Sidebar not found");
+            // fallback: add TOC as first child of #thread
+            layoutContainer.insertAdjacentElement("afterbegin", this.container);
+        }
+
+
+        const page_header = document.querySelector("#page-header");
+        if (!page_header) {
+            console.warn("Header element not found");
+            return;
+        }
+
+        const updateTOCTopOffset = () => {
+            const headerHeight = page_header.getBoundingClientRect().height;
+            this.container.style.marginTop = `${headerHeight}px`;
+        };
+
+        // Initial call to set margin-top
+        updateTOCTopOffset();
+
+        // Update on window resize
+        window.addEventListener("resize", updateTOCTopOffset);
 
     }
 
     static createHeader() {
         const header = document.createElement("div");
+        header.id="tocheader";
         const title = document.createElement("h1");
         title.textContent = "Table of contents";
         header.appendChild(title);
