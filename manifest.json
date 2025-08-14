@@ -1,11 +1,12 @@
 {
   "name": "ChatGPT ToC",
-  "description": "Provides a table of contents to ChatGPT chats.",
+  "description": "Adds a table of contents with links to user messages to ChatGPT chats.",
   "version": "1.0",
   "manifest_version": 3,
   "host_permissions": [ "*://chatgpt.com/*" ],
    "icons": {
-
+      "128": "icons/icon128.png",
+      "48": "icons/icon48.png"
    },
   "content_scripts": [ {
     "css": [ "style.css" ],
