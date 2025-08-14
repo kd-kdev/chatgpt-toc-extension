@@ -29,19 +29,12 @@ class TOCDiv {
     static createContainer(targetSelector) {
         this.container = document.createElement("div");
         this.container.id = "tocContainer";
-        this.container.style.position = "absolute";   // overlay position
-        this.container.style.maxHeight = "620px";
-        this.container.style.overflowY = "auto"; // scroll if long
-        this.container.style.overflowX = "hidden"; // hide width scroll bar
-        this.container.style.zIndex = "1000";   // keep on top but adjust if needed
 
         // update width according to viewport
         const viewportWidth = window.innerWidth;
         const desiredWidth = Math.min(Math.max(viewportWidth * 0.15, 180), 400); // 20% of viewport width, clamped between 180 and 300 px
-
         this.container.style.width = `${desiredWidth}px`;
-        this.container.style.minWidth = "180px";
-        this.container.style.maxWidth = "400px";
+
 
         // Find layout container
         const layoutContainer = document.querySelector("#thread");
@@ -49,9 +42,6 @@ class TOCDiv {
             console.warn("Layout container not found");
             return;
         }
-
-        // layoutContainer.style.display = "flex";
-        // layoutContainer.style.flexDirection = "row";
 
         // Find sidebar & header
         const sidebar = layoutContainer.querySelector(
@@ -94,21 +84,15 @@ class TOCDiv {
 
         // Update on window resize
         window.addEventListener("resize", updateTOCPosition);
-
     }
+
     static createHeader() {
         const header = document.createElement("div");
         header.id="tocheader";
-        header.style.display = "flex";
-        header.style.justifyContent = "left";
-        header.style.alignItems = "flex-start";
-        header.style.padding = "5px 8px";
 
         const toggleButton = document.createElement("button");
         toggleButton.id="toggleButton";
         toggleButton.textContent = "-";
-        toggleButton.style.cursor = "pointer";
-        toggleButton.style.backgroundColor = "#181818";
 
         const title = document.createElement("h1");
         title.textContent = "Table of contents";
@@ -121,7 +105,7 @@ class TOCDiv {
             // toggle display & button text
             listContainer.style.display = isCollapsed ? "block" : "none";
             title.style.display = isCollapsed ? "block" : "none";
-            header.style.borderBottom = isCollapsed ? "0.5px solid white" : "none";
+            header.classList.toggle("collapsed", !isCollapsed); //toggles collapsed style in css
             toggleButton.textContent = isCollapsed ? "-" : "☰";
         });
 
@@ -134,10 +118,6 @@ class TOCDiv {
         const listContainer = document.createElement("div");
         listContainer.id = "listContainer"
         const orderedList = document.createElement("ol");
-        orderedList.style.listStyle = "decimal";
-        orderedList.style.paddingLeft = "20px"; // ensures spacing for numbers
-        orderedList.style.margin = "1em 0"; // optional for spacing
-
 
         for (const item of userMessages) {
             const list = document.createElement("li");
@@ -148,7 +128,6 @@ class TOCDiv {
             const isTooLong = item.text.length > CONSTANTS.MAX_MESSAGE_LENGTH;
             const trimmedText = item.text.slice(0, CONSTANTS.MAX_MESSAGE_LENGTH);
             anchor.textContent = isTooLong ? trimmedText + '...' : item.text;
-
 
             list.appendChild(anchor);
             orderedList.appendChild(list);
@@ -177,12 +156,10 @@ class TOCDiv {
 
         this.container.querySelector("#listContainer")?.remove();
         this.createList(userMessages);
-
     }
 }
 
 let chatMessagesObserver = null;
-
 // Mutation observer - updates the TOC
 function setupMutationObserver() {
 
@@ -246,15 +223,6 @@ function getCurrentChatId() {
     const match = url.match(/chatgpt\.com\/c\/([^/?#]+)/);
     return match ? match[1] : null;
 }
-
-// function checkChatChange() {
-//     const newChatId = getCurrentChatId();
-//     if (newChatId !== this.currentChatId) {
-//       console.log(`Chat changed from ${this.currentChatId} to ${newChatId}`);
-//       this.currentChatId = newChatId;
-//       setTimeout(() => TOCDiv.updateTOC(), CONSTANTS.WAIT_TIME);
-//     }
-
 
 /**
  * Main class
